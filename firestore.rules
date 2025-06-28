@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Comics rules
+    match /comics/{comicId} {
+      // Anyone can read public comics
+      allow read: if resource.data.isPublic == true;
+      
+      // Authors and collaborators can read their comics
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.authorId || 
+         request.auth.uid in resource.data.collaborators);
+      
+      // Only authors can create comics
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.authorId;
+      
+      // Authors and collaborators can update comics
+      allow update: if request.auth != null && 
+        (request.auth.uid == resource.data.authorId || 
+         request.auth.uid in resource.data.collaborators);
+      
+      // Only authors can delete comics
+      allow delete: if request.auth != null && 
+        request.auth.uid == resource.data.authorId;
+    }
+  }
+}

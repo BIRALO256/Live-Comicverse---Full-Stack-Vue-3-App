@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "comics": {
+      "$comicId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "panels": {
+          "$panelId": {
+            ".read": "auth != null",
+            ".write": "auth != null"
+          }
+        }
+      }
+    }
+  }
+}
